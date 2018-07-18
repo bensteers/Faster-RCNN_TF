@@ -13,6 +13,7 @@ import datasets.pascal_voc
 import datasets.imagenet3d
 import datasets.kitti
 import datasets.kitti_tracking
+import datasets.uo_images
 import numpy as np
 
 def _selective_search_IJCV_top_k(split, year, top_k):
@@ -23,6 +24,17 @@ def _selective_search_IJCV_top_k(split, year, top_k):
     imdb.roidb_handler = imdb.selective_search_IJCV_roidb
     imdb.config['top_k'] = top_k
     return imdb
+
+
+
+
+# UO dataset
+for split in ['train', 'val', 'trainval', 'test']:
+    name = 'uo_{}'.format(split)
+    print name
+    __sets[name] = (lambda split=split:
+            datasets.uo_images(split))
+
 
 # Set up voc_<year>_<split> using selective search "fast" mode
 for year in ['2007', '2012']:
