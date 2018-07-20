@@ -6,7 +6,7 @@ from rpn_msr.proposal_layer_tf import proposal_layer as proposal_layer_py
 from rpn_msr.anchor_target_layer_tf import anchor_target_layer as anchor_target_layer_py
 from rpn_msr.proposal_target_layer_tf import proposal_target_layer as proposal_target_layer_py
 
-
+p = lambda x, s: tf.Print(x, [x], str(s))
 
 DEFAULT_PADDING = 'SAME'
 
@@ -24,7 +24,8 @@ def layer(op):
         # Perform the operation and get the output.
         layer_output = op(self, layer_input, *args, **kwargs)
         # Add to layer LUT.
-        self.layers[name] = layer_output
+        #if hasattr(layer_output, name): name = layer_output.name[:-2].split('/')[-1] or name
+	self.layers[name] = layer_output
         # This output is now the input for the next layer.
         self.feed(layer_output)
         # Return self for chained calls.
@@ -118,6 +119,12 @@ class Network(object):
             return tf.nn.bias_add(conv, biases, name=scope.name)
 
     @layer
+    def p(self, input, text, name=''):
+	if isinstance(input, tuple):
+            input = input[0]
+	return tf.Print(input, [input], str(text), name=str(text).replace(' ', '_') or name)
+
+    @layer
     def relu(self, input, name):
         return tf.nn.relu(input, name=name)
 
@@ -188,7 +195,7 @@ class Network(object):
 
             rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights = tf.py_func(proposal_target_layer_py,[input[0],input[1],classes],[tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
 
-            rois = tf.reshape(rois,[-1,5] , name = 'rois') 
+            rois = tf.reshape(rois,[-1,5] , name = 'rois')
             labels = tf.convert_to_tensor(tf.cast(labels,tf.int32), name = 'labels')
             bbox_targets = tf.convert_to_tensor(bbox_targets, name = 'bbox_targets')
             bbox_inside_weights = tf.convert_to_tensor(bbox_inside_weights, name = 'bbox_inside_weights')

@@ -4,7 +4,7 @@ from networks.network import Network
 
 #define
 
-n_classes = 21
+n_classes = 6
 _feat_stride = [16,]
 anchor_scales = [8, 16, 32]
 
@@ -48,8 +48,9 @@ class VGGnet_train(Network):
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool4')
              .conv(3, 3, 512, 1, 1, name='conv5_1')
              .conv(3, 3, 512, 1, 1, name='conv5_2')
-             .conv(3, 3, 512, 1, 1, name='conv5_3'))
+             .conv(3, 3, 512, 1, 1, name='conv5_3').p('convs done'))
         #========= RPN ============
+
         (self.feed('conv5_3')
              .conv(3,3,512,1,1,name='rpn_conv/3x3')
              .conv(1,1,len(anchor_scales)*3*2 ,1 , 1, padding='VALID', relu = False, name='rpn_cls_score'))
@@ -89,4 +90,3 @@ class VGGnet_train(Network):
 
         (self.feed('drop7')
              .fc(n_classes*4, relu=False, name='bbox_pred'))
-

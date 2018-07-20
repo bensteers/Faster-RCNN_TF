@@ -19,6 +19,8 @@ import sys
 from tensorflow.python.client import timeline
 import time
 
+p = lambda x, s: tf.Print(x, [x], str(s))
+
 class SolverWrapper(object):
     """A simple wrapper around Caffe's solver.
     This wrapper gives us control over he snapshotting process, which we
@@ -133,7 +135,7 @@ class SolverWrapper(object):
         bbox_targets = self.net.get_output('roi-data')[2]
         bbox_inside_weights = self.net.get_output('roi-data')[3]
         bbox_outside_weights = self.net.get_output('roi-data')[4]
-
+	
         smooth_l1 = self._modified_smooth_l1(1.0, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
         loss_box = tf.reduce_mean(tf.reduce_sum(smooth_l1, reduction_indices=[1]))
 
@@ -171,12 +173,11 @@ class SolverWrapper(object):
                 run_metadata = tf.RunMetadata()
 
             timer.tic()
-
             rpn_loss_cls_value, rpn_loss_box_value,loss_cls_value, loss_box_value, _ = sess.run([rpn_cross_entropy, rpn_loss_box, cross_entropy, loss_box, train_op],
                                                                                                 feed_dict=feed_dict,
                                                                                                 options=run_options,
                                                                                                 run_metadata=run_metadata)
-
+	    sys.stdout.flush()
             timer.toc()
 
             if cfg.TRAIN.DEBUG_TIMELINE:
