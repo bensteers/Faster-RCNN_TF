@@ -23,7 +23,7 @@ import pdb
 
 
 class uo_images(pascal_voc):
-    def __init__(self, image_set, year='0000', devkit_path=None):
+    def __init__(self, image_set, year='99999', devkit_path=None):
         imdb.__init__(self, 'uo_' + image_set)
         self._year = year
         self._image_set = image_set
@@ -31,7 +31,7 @@ class uo_images(pascal_voc):
         self._data_path = os.path.join(self._devkit_path, 'UOImages')
         self._classes = ('__background__', 'plume', 'shadow', 'cloud', 'light', 'ambiguous')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
-        self._image_ext = '.png'
+        self._image_ext = '.jpg'#'.png'
         self._image_index = self._load_image_set_index()
         # Default to roidb handler
         #self._roidb_handler = self.selective_search_roidb
